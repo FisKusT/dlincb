@@ -22,6 +22,7 @@ class RBNS_Classifier:
         else:
             self.model = self.build_model()
 
+    # TODO:
     # def predict_rna_sequences(self, rna_sequences):
     #     # Measure start time
     #     start_time = time.time()

@@ -1,5 +1,4 @@
 # utils class
-import random
 
 import numpy as np
 import time
@@ -66,11 +65,3 @@ def convert_sequences_to_one_hot_vector(sequences):
                     one_hot_tensor[i, j, nucleotide_index] = 1.0
 
     return one_hot_tensor
-
-
-# def convert_rna_sequence_to_one_hot_vector_of_batches(rna_sequences):
-#     # Create a mapping of nucleotides to indices
-#     nucleotide_to_index = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
-#     one_hot_tensor = np.zeros((20, 4), dtype=np.float32)
-#     for i, rna_sequences in enumerate(rna_sequences)
-
