@@ -125,7 +125,11 @@ def convert_all_to_one_hot(sequences, one_hot_encoded_size, sub_sequence_length)
     """
     seq = np.zeros((len(sequences), sub_sequence_length, one_hot_encoded_size), dtype=np.float32)
     for index, sequence in np.ndenumerate(sequences):
-        seq[index] = one_hote(sequence)
+        if len(sequence) > sub_sequence_length:
+            new_sequence = sequence[0:sub_sequence_length]
+            seq[index] = one_hote(new_sequence)
+        else:
+            seq[index] = one_hote(sequence)
 
     return seq
 
