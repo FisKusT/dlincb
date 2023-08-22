@@ -1,6 +1,7 @@
 # The neural network model
 # each protein has a different model
 
+import dlincb_utils
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
@@ -14,38 +15,94 @@ import time
 
 
 class RBNS_Classifier:
-    def __init__(self, use_load_model=False):
+    def __init__(self, use_load_model=False, one_hot_encoded_size = 4, sub_sequence_length=20):
+        """
+        Initialize the model class.
+        :param use_load_model: use the load model or build it
+        """
         self.train_history = None
-        self.model_path = "C:/Users/sorte/Desktop/BIU/DL in CB/project/bestmodel.h5"
+        self.model_path = "bestmodel.h5"
         if use_load_model:
             self.model = load_model(self.model_path)
         else:
-            self.model = self.build_model()
+            self.model = self.build_model(one_hot_encoded_size=one_hot_encoded_size, sub_sequence_length=sub_sequence_length)
 
-    # TODO:
-    # def predict_rna_sequences(self, rna_sequences):
-    #     # Measure start time
-    #     start_time = time.time()
-    #     # generate from RNA sequence- subsequences of len 20 one hot vectors
-    #     rna_sub_sequences_list = []
-    #     batches_indexes_list = [0]
-    #     for rna_sequence in rna_sequences:
-    #         rna_sub_sequences = convert_rna_sequence_to_batches(rna_sequence)
-    #         batches_index = batches_indexes_list[-1] + len(rna_sub_sequences)
-    #         rna_sub_sequences_list = np.concatenate([rna_sub_sequences_list, rna_sub_sequences])
-    #         batches_indexes_list.append(batches_index)
-    #     rna_sub_sequences_one_hot = convert_sequences_to_one_hot_vector(rna_sub_sequences_list)
-    #     predictions = self.model.predict(rna_sub_sequences_one_hot)
-    #     # get max predictions of every RNA
-    #     max_predictions_list = []
-    #     for i in range(len(batches_indexes_list) - 1):
-    #         max_prediction = np.amax(predictions[batches_indexes_list[i]:batches_indexes_list[i + 1]])
-    #         max_predictions_list.append(max_prediction * 3 - 1)
-    #     # Measure end time
-    #     print("Total runtime of predict_rna_sequence:", (time.time() - start_time), "seconds")
-    #     return np.array(max_predictions_list, dtype=np.float32)
+    def predict_for_batch(self, data, max_combinaisons, one_hot_encoded_size, sub_sequence_length):
+        """
+        Do the prediction for all the batch.
+        :param sub_sequence_length:
+        :param one_hot_encoded_size:
+        :param data:
+        :param max_combinaisons:
+        :return:
+        """
+        batch_size = len(data)
+        reshaped_input = data.reshape(-1, sub_sequence_length, one_hot_encoded_size)
+
+        # Make predictions for all 19 arrays in one pass
+        predictions = self.model.predict(reshaped_input)
+
+        # Reshape the predictions to match the original shape of (batch_size, max_combinations)
+        predictions = predictions.reshape(batch_size, max_combinaisons)
+
+        max_preds = dlincb_utils.clean_padding_from_prediction(data, predictions, batch_size, max_combinaisons)
+        return np.max(max_preds, axis=1)
+
+    def do_prediction(self, all_subsequences, max_combinaisons, one_hot_encoded_size, sub_sequence_length):
+        """
+
+        :param all_subsequences:
+        :param max_combinaisons:
+        :param one_hot_encoded_size:
+        :param sub_sequence_length:
+        :return:
+        """
+        predictions = []
+        batch_size = 128
+        num_batches = len(all_subsequences) // batch_size
+        remaining_sequences = len(all_subsequences) % batch_size
+        for batch_index in range(num_batches):
+            start_index = batch_index * batch_size
+            end_index = start_index + batch_size
+            batch = all_subsequences[start_index:end_index]
+
+            self.process_prediction_by_batch(batch, max_combinaisons, predictions, batch_index, num_batches,
+                                             one_hot_encoded_size=one_hot_encoded_size, sub_sequence_length=sub_sequence_length)
+
+        if remaining_sequences > 0:
+            start_index = num_batches * batch_size
+            remaining_batch = all_subsequences[start_index:]
+            self.process_prediction_by_batch(remaining_batch, max_combinaisons, predictions, num_batches, num_batches,
+                                             one_hot_encoded_size=one_hot_encoded_size, sub_sequence_length=sub_sequence_length)
+
+        return predictions
+
+    def process_prediction_by_batch(self, batch, max_combinaisons, predictions, batch_index, num_batches, one_hot_encoded_size, sub_sequence_length):
+        """
+
+        :param batch:
+        :param max_combinaisons:
+        :param predictions:
+        :param batch_index:
+        :param num_batches:
+        :param one_hot_encoded_size:
+        :param sub_sequence_length:
+        :return:
+        """
+        print("Prediction : " + str((batch_index + 1)) + " / " + str(num_batches))
+        encoded_batches = dlincb_utils.one_hot_encoding_rna_sequences_by_batch(batch, max_combinaisons,
+                                                                               one_hot_encoded_size=one_hot_encoded_size,
+                                                                               sub_sequence_length=sub_sequence_length)
+        predictions.extend(self.predict_for_batch(encoded_batches, max_combinaisons=max_combinaisons,
+                                                  one_hot_encoded_size=one_hot_encoded_size, sub_sequence_length=sub_sequence_length))
 
     def train_model(self, x, y):
+        """
+        Train the model.
+        :param x: x data
+        :param y: labels data
+        :return: train history
+        """
         print("Start train model")
         # Measure start time
         start_time = time.time()
@@ -74,7 +131,10 @@ class RBNS_Classifier:
         print("Total runtime of train_model:", (time.time() - start_time), "seconds")
         return self.train_history
 
-    def build_model(self):
+    def build_model(self, one_hot_encoded_size, sub_sequence_length):
+        """
+            Build our sequential model.
+        """
         # create keras sequential model
         model = Sequential()
         # 1D convolutional layer
@@ -84,7 +144,7 @@ class RBNS_Classifier:
                          kernel_initializer='RandomNormal',
                          activation='relu',
                          kernel_regularizer=l2(5e-3),
-                         input_shape=(20, 4),
+                         input_shape=(sub_sequence_length, one_hot_encoded_size),
                          use_bias=True,
                          bias_initializer='RandomNormal'))
 
