@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     print("Total runtime:", (time.time() - start_time), "seconds")
 
-    dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=8)
+    # dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=8)
     # dlincb_utils.calculate_and_graph_pearson_for_all()
     # Calculate and print total runtime
     print("Total runtime of a single protein:", (time.time() - start_time), "seconds")
