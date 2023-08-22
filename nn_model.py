@@ -109,8 +109,7 @@ class RBNS_Classifier:
         # make training and validation set
         x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                             test_size=0.2,
-                                                            shuffle=True,
-                                                            random_state=123)
+                                                            shuffle=True)
         # train the model
         self.train_history = self.model.fit(x_train, y_train,
                                             batch_size=64,
@@ -119,10 +118,6 @@ class RBNS_Classifier:
                                             shuffle=True,
                                             verbose=1,
                                             callbacks=[
-                                                ModelCheckpoint(
-                                                    self.model_path,
-                                                    monitor='val_loss',
-                                                    save_best_only=True),
                                                 EarlyStopping(monitor='val_loss',
                                                               patience=3,
                                                               restore_best_weights=True)
