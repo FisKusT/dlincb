@@ -1,7 +1,10 @@
 # utils class
+import os
 
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import scipy
 
 
 def extract_data_from_file_to_array(seq_file_path):
@@ -170,3 +173,61 @@ def clean_padding_from_prediction(data, predictions, batch_size, max_combinaison
                 max_preds.append(float('-inf'))
 
     return np.array(max_preds).reshape(batch_size, max_combinaisons)
+
+
+def write_predictions_to_file(predictions, protein_number):
+    # Define the file path
+    file_path = "Predictions/" + str(protein_number) + ".txt"
+
+    # Open the file for writing
+    with open(file_path, 'w') as file:
+        for value in predictions:
+            file.write(f"{value}\n")
+
+
+def generate_graph(data):
+    names = list(data.keys())
+    values = list(data.values())
+
+    # Create a bar graph
+    plt.figure(figsize=(10, 6))  # Set the figure size
+    plt.bar(names, values)
+
+    # Customize the plot (optional)
+    plt.xlabel('Items')
+    plt.ylabel('Values')
+    plt.title('Bar Graph of 16 Numbers')
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+
+    # Display the plot (you may also save it to a file if needed)
+    plt.tight_layout()
+    plt.savefig("correlation_graph.png")
+    plt.show()
+
+
+def calculate_and_graph_pearson_for_all():
+    directory = 'Predictions'
+    data = {}
+
+    # Iterate over files in the directory
+    for filename in os.listdir(directory):
+        if filename.endswith('.txt'):
+            # Extract the key (name without '.txt' extension)
+            key = filename[:-4]  # Remove the last 4 characters (.txt)
+
+            real_rna_values_file = "RNCMPT_training/RBP" + key + ".txt"
+            real_rna_values = np.array(extract_data_from_file_to_array(real_rna_values_file),
+                                       dtype=np.float32)
+
+            rna_predictions_file = "Predictions/" + filename
+            rna_predictions_values = np.array(extract_data_from_file_to_array(rna_predictions_file),
+                                       dtype=np.float32)
+
+            correlation = scipy.stats.pearsonr(rna_predictions_values, real_rna_values)
+
+            # Add the key-value pair to the dictionary
+            data[key] = correlation
+
+            print("Pearson correlation for protein " + str(key) + " = ", correlation)
+
+    generate_graph(data)
