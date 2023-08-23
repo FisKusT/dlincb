@@ -4,11 +4,11 @@
 import dlincb_utils
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Conv1D, MaxPooling1D, Flatten, Dense
+from keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, BatchNormalization, Dropout, LeakyReLU
 from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.src.regularizers import l2
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, LearningRateScheduler
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
 import time
@@ -58,7 +58,7 @@ class RBNS_Classifier:
         :return:
         """
         predictions = []
-        batch_size = 128
+        batch_size = 512
         num_batches = len(all_subsequences) // batch_size
         remaining_sequences = len(all_subsequences) % batch_size
         for batch_index in range(num_batches):
@@ -111,18 +111,20 @@ class RBNS_Classifier:
                                                             test_size=0.2,
                                                             shuffle=True,
                                                             random_state=42)
+
+        callbacks = [
+            EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True),
+            ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=1e-7)
+        ]
+
         # train the model
         self.train_history = self.model.fit(x_train, y_train,
-                                            batch_size=64,
+                                            batch_size=2048,
                                             epochs=30,
                                             validation_data=(x_test, y_test),
                                             shuffle=True,
                                             verbose=1,
-                                            callbacks=[
-                                                EarlyStopping(monitor='val_loss',
-                                                              patience=3,
-                                                              restore_best_weights=True)
-                                            ])
+                                            callbacks=callbacks)
         # Measure end time
         print("Total runtime of train_model:", (time.time() - start_time), "seconds")
         return self.train_history
@@ -137,8 +139,8 @@ class RBNS_Classifier:
         model.add(Conv1D(filters=512,
                          kernel_size=8,
                          strides=1,
-                         kernel_initializer='RandomNormal',
-                         activation='relu',
+                         kernel_initializer='glorot_normal', # xavier initialization
+                         activation=LeakyReLU(alpha=0.01),
                          kernel_regularizer=l2(5e-3),
                          input_shape=(sub_sequence_length, one_hot_encoded_size),
                          use_bias=True,
@@ -151,9 +153,15 @@ class RBNS_Classifier:
         model.add(Flatten())
 
         # Fully Connected Layers
-        model.add(Dense(64, activation='relu'))
-        model.add(Dense(32, activation='relu'))
-        model.add(Dense(32, activation='relu'))
+        model.add(Dense(64, activation=LeakyReLU(alpha=0.01)))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.5))
+        model.add(Dense(64, activation=LeakyReLU(alpha=0.01)))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.5))
+        model.add(Dense(64, activation=LeakyReLU(alpha=0.01)))
+        model.add(Dense(32, activation=LeakyReLU(alpha=0.01)))
+        model.add(Dense(16, activation=LeakyReLU(alpha=0.01)))
 
         # Output layer with sigmoid activation for binary classification
         model.add(Dense(1, activation='sigmoid'))

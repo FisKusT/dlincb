@@ -35,7 +35,7 @@ def extract_data_from_rbns_file(seq_file_path):
         # random.shuffle(lines)
         # get first 500K lines
         for index, line in enumerate(lines):
-            if index == 500000:
+            if index == 1000000: # 1 million
                 break
             if '\t' in line:
                 extracted_data.append(line.strip().split('\t')[0])

@@ -1,12 +1,15 @@
 # Project in Deep Learning in Computational Biology course.
 
 import dlincb_utils
+import os
 from nn_model import RBNS_Classifier
 import time
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use the first GPU
+
     sub_sequence_length = 20
     one_hot_encoded_size = 4
 
@@ -50,8 +53,9 @@ if __name__ == '__main__':
 
     print("Total runtime:", (time.time() - start_time), "seconds")
 
-    # dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=8)
-    # dlincb_utils.calculate_and_graph_pearson_for_all()
+    dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=8)
+    dlincb_utils.calculate_and_graph_pearson_for_all()
+
     # Calculate and print total runtime
     print("Total runtime of a single protein:", (time.time() - start_time), "seconds")
 
