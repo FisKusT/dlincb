@@ -180,36 +180,47 @@ def clean_padding_from_prediction(data, predictions, batch_size, max_combinaison
 
 
 def write_predictions_to_file(predictions, protein_number):
-    # Define the file path
+    """
+    Write the predictions list into a txt file
+    :param predictions:
+    :param protein_number:
+    :return:
+    """
     file_path = "Predictions/" + str(protein_number) + ".txt"
 
-    # Open the file for writing
     with open(file_path, 'w') as file:
         for value in predictions:
             file.write(f"{value}\n")
 
 
 def generate_graph(data):
+    """
+    Generate the Pearson correlation graph
+    :param data:
+    :return:
+    """
     names = list(data.keys())
-    values = list(data.values())
+    values = [corr[0] for corr in data.values()]
 
     # Create a bar graph
     plt.figure(figsize=(10, 6))  # Set the figure size
     plt.bar(names, values)
 
     # Customize the plot (optional)
-    plt.xlabel('Items')
-    plt.ylabel('Values')
-    plt.title('Bar Graph of 16 Numbers')
-    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
-
-    # Display the plot (you may also save it to a file if needed)
+    plt.xlabel('Protein number')
+    plt.ylabel('Pearson Correlation')
+    plt.title('Pearson Correlation between real values and RBNS training predictions')
+    plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig("correlation_graph.png")
     plt.show()
 
 
 def calculate_and_graph_pearson_for_all():
+    """
+    Calculate the pearson correlation for all the proteins predicitons files
+    :return:
+    """
     directory = 'Predictions'
     data = {}
 

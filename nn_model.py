@@ -109,7 +109,8 @@ class RBNS_Classifier:
         # make training and validation set
         x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                             test_size=0.2,
-                                                            shuffle=True)
+                                                            shuffle=True,
+                                                            random_state=42)
         # train the model
         self.train_history = self.model.fit(x_train, y_train,
                                             batch_size=64,
