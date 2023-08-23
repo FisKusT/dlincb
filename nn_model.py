@@ -119,7 +119,7 @@ class RBNS_Classifier:
 
         # train the model
         self.train_history = self.model.fit(x_train, y_train,
-                                            batch_size=2048,
+                                            batch_size=4096,
                                             epochs=30,
                                             validation_data=(x_test, y_test),
                                             shuffle=True,
