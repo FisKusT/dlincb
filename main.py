@@ -2,6 +2,7 @@
 
 import dlincb_utils
 import os
+import sys
 from nn_model import RBNS_Classifier
 import time
 
@@ -16,13 +17,11 @@ if __name__ == '__main__':
     # Measure start time
     start_time = time.time()
 
-    # Parse RBNS data for protein
-    seq_file_list = [
-        "C:/Users/sorte/Desktop/BIU/DL in CB/project/RBNS_testing/RBP18_input.seq",
-        "C:/Users/sorte/Desktop/BIU/DL in CB/project/RBNS_testing/RBP18_1300nM.seq"
-    ]
+    input_seq_file = sys.argv[2]
+    high_seq_file = sys.argv[-1]
+    rna_file = sys.argv[1]
 
-    x_one_hot, y_labels = dlincb_utils.create_train_and_test_set_from_seq_files(seq_file_list,
+    x_one_hot, y_labels = dlincb_utils.create_train_and_test_set_from_seq_files([input_seq_file, high_seq_file],
                                                                                 one_hot_encoded_size=one_hot_encoded_size,
                                                                                 sub_sequence_length=sub_sequence_length)
 
@@ -38,7 +37,6 @@ if __name__ == '__main__':
     # Parse RNA data
     start_time3 = time.time()
 
-    rna_file = "RNAcompete_sequences.txt"
     rna_sequences = dlincb_utils.extract_data_from_file_to_array(rna_file)
     all_sequences, max_combinaisons = dlincb_utils.generate_subsequences(rna_sequences,
                                                                          sub_sequence_length=sub_sequence_length)
@@ -53,7 +51,7 @@ if __name__ == '__main__':
 
     print("Total runtime:", (time.time() - start_time), "seconds")
 
-    dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=18)
+    dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=31)
     # dlincb_utils.calculate_and_graph_pearson_for_all()
 
     # Calculate and print total runtime

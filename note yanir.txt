@@ -1,0 +1,4 @@
+    seq_file_list = [
+        "C:/Users/sorte/Desktop/BIU/DL in CB/project/RBNS_testing/RBP31_input.seq",
+        "C:/Users/sorte/Desktop/BIU/DL in CB/project/RBNS_testing/RBP31_1000nM.seq"
+    ]
