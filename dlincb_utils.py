@@ -12,7 +12,7 @@ import scipy
 
 def extract_data_from_file_to_array(seq_file_path):
     """
-
+    Extract data from input files to array.
     :param seq_file_path:
     :return:
     """
@@ -25,7 +25,7 @@ def extract_data_from_file_to_array(seq_file_path):
 
 def extract_data_from_rbns_file(seq_file_path):
     """
-
+    Extract the data from the input files.
     :param seq_file_path:
     :return:
     """
@@ -49,7 +49,7 @@ def extract_data_from_rbns_file(seq_file_path):
 
 def create_train_and_test_set_from_seq_files(seq_files_paths_list, one_hot_encoded_size, sub_sequence_length):
     """
-
+    Create the train and test set from the received files.
     :param seq_files_paths_list:
     :param one_hot_encoded_size:
     :param sub_sequence_length:
@@ -104,7 +104,7 @@ def one_hot_encoding_rna_sequences_by_batch(batch_sequences, max_combinaisons, o
 
 def one_hote(sequence):
     """
-
+    One hot encoding for a RNA sequence.
     :param sequence:
     :return:
     """
@@ -120,7 +120,7 @@ def one_hote(sequence):
 
 def convert_all_to_one_hot(sequences, one_hot_encoded_size, sub_sequence_length):
     """
-
+    Convert list of RNA sequences.
     :param sequences:
     :param one_hot_encoded_size:
     :param sub_sequence_length:

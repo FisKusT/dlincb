@@ -54,7 +54,7 @@ class RBNS_Classifier:
 
     def do_prediction(self, all_subsequences, max_combinaisons, one_hot_encoded_size, sub_sequence_length):
         """
-
+        Function to do the prediction for all sequences
         :param all_subsequences:
         :param max_combinaisons:
         :param one_hot_encoded_size:
@@ -83,7 +83,7 @@ class RBNS_Classifier:
 
     def process_prediction_by_batch(self, batch, max_combinaisons, predictions, batch_index, num_batches, one_hot_encoded_size, sub_sequence_length):
         """
-
+        Do the prediction for batch
         :param batch:
         :param max_combinaisons:
         :param predictions:
