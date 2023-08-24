@@ -26,6 +26,7 @@ class RBNS_Classifier:
             self.model = load_model(self.model_path)
         else:
             self.model = self.build_model(one_hot_encoded_size=one_hot_encoded_size, sub_sequence_length=sub_sequence_length)
+        self.model.summary()
 
     def predict_for_batch(self, data, max_combinaisons, one_hot_encoded_size, sub_sequence_length):
         """
