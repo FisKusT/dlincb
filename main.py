@@ -37,6 +37,7 @@ if __name__ == '__main__':
     # Parse RNA data
     start_time3 = time.time()
 
+    rna_file = "RNAcompete_sequences.txt"
     rna_sequences = dlincb_utils.extract_data_from_file_to_array(rna_file)
     all_sequences, max_combinaisons = dlincb_utils.generate_subsequences(rna_sequences,
                                                                          sub_sequence_length=sub_sequence_length)
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 
     print("Total runtime:", (time.time() - start_time), "seconds")
 
-    dlincb_utils.write_predictions_to_file(rna_predictions, protein_number=31)
+    dlincb_utils.write_predictions_to_file(rna_predictions)
     # dlincb_utils.calculate_and_graph_pearson_for_all()
 
     # Calculate and print total runtime

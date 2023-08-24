@@ -1,3 +1,6 @@
+# Tal Fiskus (ID: 208423707)
+# Yoel Benabou (ID: 342875648)
+
 # The neural network model
 # each protein has a different model
 

@@ -1,3 +1,6 @@
+# Tal Fiskus (ID: 208423707)
+# Yoel Benabou (ID: 342875648)
+
 # utils class
 import os
 
@@ -179,14 +182,14 @@ def clean_padding_from_prediction(data, predictions, batch_size, max_combinaison
     return np.array(max_preds).reshape(batch_size, max_combinaisons)
 
 
-def write_predictions_to_file(predictions, protein_number):
+def write_predictions_to_file(predictions):
     """
     Write the predictions list into a txt file
     :param predictions:
     :param protein_number:
     :return:
     """
-    file_path = "Predictions/" + str(protein_number) + ".txt"
+    file_path = "Prediction_208423707_342875648.txt"
 
     with open(file_path, 'w') as file:
         for value in predictions:
