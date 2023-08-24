@@ -33,9 +33,9 @@ def extract_data_from_rbns_file(seq_file_path):
         lines = seq_file.readlines()
         # Shuffle the lines
         # random.shuffle(lines)
-        # get first 500K lines
+        # get first 1 million lines
         for index, line in enumerate(lines):
-            if index == 1000000: # 1 million
+            if index == 1000000:  # 1 million
                 break
             if '\t' in line:
                 extracted_data.append(line.strip().split('\t')[0])
@@ -202,15 +202,19 @@ def generate_graph(data):
     names = list(data.keys())
     values = [corr[0] for corr in data.values()]
 
+    mean_value = sum(values) / len(values)
+
     # Create a bar graph
     plt.figure(figsize=(10, 6))  # Set the figure size
     plt.bar(names, values)
+
+    plt.axhline(mean_value, color='red', linestyle='--', label=f'Mean: {mean_value:.2f}')
 
     # Customize the plot (optional)
     plt.xlabel('Protein number')
     plt.ylabel('Pearson Correlation')
     plt.title('Pearson Correlation between real values and RBNS training predictions')
-    plt.xticks(rotation=45)
+    plt.legend()  # Show legend with the updated label
     plt.tight_layout()
     plt.savefig("correlation_graph.png")
     plt.show()
@@ -236,7 +240,7 @@ def calculate_and_graph_pearson_for_all():
 
             rna_predictions_file = "Predictions/" + filename
             rna_predictions_values = np.array(extract_data_from_file_to_array(rna_predictions_file),
-                                       dtype=np.float32)
+                                              dtype=np.float32)
 
             correlation = scipy.stats.pearsonr(rna_predictions_values, real_rna_values)
 
